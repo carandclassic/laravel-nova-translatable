@@ -1,5 +1,5 @@
 {
-    "name": "spatie/nova-translatable",
+    "name": "carandclassic/laravel-nova-translatable",
     "description": "Making Nova fields translatable",
     "keywords": [
         "laravel",

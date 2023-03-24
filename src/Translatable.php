@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Support\Str;
 use Laravel\Nova\Fields\Field;
+use Laravel\Nova\Fields\Trix;
 use Laravel\Nova\Http\Controllers\ResourceIndexController;
 use Spatie\NovaTranslatable\Exceptions\InvalidConfiguration;
 
@@ -171,6 +172,10 @@ class Translatable extends MergeValue
 
                 $this->data[] = $translatedField;
                 $this->translatedFieldsByLocale[$locale][] = $translatedField;
+
+                if ($field instanceof Trix) {
+                    $this->data[] = $this->getTrixUploadField($field, $locale);
+                }
             });
     }
 
@@ -233,5 +238,18 @@ class Translatable extends MergeValue
         $currentController = Str::before(request()->route()->getAction()['controller'] ?? '', '@');
 
         return $currentController === ResourceIndexController::class;
+    }
+
+    private function getTrixUploadField(Field $field, string $locale)
+    {
+        return Trix::make('translations_' . $field->attribute . '_' . $locale)
+            ->withFiles(
+                $field->getStorageDisk(),
+                $field->getStorageDir()
+            )
+            ->hideFromIndex()
+            ->hideWhenCreating()
+            ->hideFromDetail()
+            ->hideWhenUpdating();
     }
 }
